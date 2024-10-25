@@ -1,9 +1,21 @@
+import os
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
-from config import Config
+# Import the appropriate config class
+from config import DevelopmentConfig, TestingConfig, ProductionConfig
 
 app = Flask(__name__)
-app.config.from_object(Config)
+
+# Load the configuration based on FLASK_ENV
+env = os.getenv('FLASK_ENV', 'development')
+if env == 'production':
+    app.config.from_object(ProductionConfig)
+elif env == 'testing':
+    app.config.from_object(TestingConfig)
+else:
+    app.config.from_object(DevelopmentConfig)
+
 mysql = MySQL(app)
 
 # Home page to view all discs

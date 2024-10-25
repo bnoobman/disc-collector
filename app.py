@@ -5,7 +5,6 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 mysql = MySQL(app)
-app.secret_key = 'your_secret_key'
 
 # Home page to view all discs
 @app.route('/')

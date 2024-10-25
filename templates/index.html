@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Disc Collection{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">My Disc Collection</h1>
+
+    <form action="/search" method="get" class="d-flex mb-3">
+        <input class="form-control me-2" type="text" name="query" placeholder="Search discs...">
+        <select class="form-select me-2" name="sort_by">
+            <option value="manufacturer">Manufacturer</option>
+            <option value="mold">Mold</option>
+            <option value="speed">Speed</option>
+        </select>
+        <button class="btn btn-primary" type="submit">Search & Sort</button>
+    </form>
+
+    <a href="/add" class="btn btn-success mb-4">Add a New Disc</a>
+
+    <ul class="list-group">
+        {% for disc in discs %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ disc.manufacturer }}</strong> - {{ disc.mold }} (Type: {{ disc.type }})
+                (Plastic: {{ disc.plastic }}, Speed: {{ disc.speed }}, Glide: {{ disc.glide }},
+                Turn: {{ disc.turn }}, Fade: {{ disc.fade }}, Color: {{ disc.color }}, Notes: {{ disc.notes }})
+                {% if disc.is_lost %}
+                    <span class="badge bg-danger">Lost</span>
+                {% endif %}
+            </div>
+            <div>
+                <a href="/edit/{{ disc.id }}" class="btn btn-warning btn-sm me-2">Edit</a>
+                <form action="/delete/{{ disc.id }}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+                <form action="/mark_lost/{{ disc.id }}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-secondary btn-sm">Mark as Lost</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Add a Disc{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Add a New Disc</h1>
+
+    <form action="/add" method="post">
+        <!-- Other fields -->
+        <div class="mb-3">
+            <label for="manufacturer" class="form-label">Manufacturer</label>
+            <input type="text" class="form-control" id="manufacturer" name="manufacturer" required>
+        </div>
+        <!-- Add the dropdown for Type -->
+        <div class="mb-3">
+            <label for="type" class="form-label">Type</label>
+            <select class="form-select" id="type" name="type" required>
+                <option value="" disabled selected>Select Type</option>
+                <option value="Distance Driver">Distance Driver</option>
+                <option value="Fairway Driver">Fairway Driver</option>
+                <option value="Midrange">Midrange</option>
+                <option value="Putter">Putter</option>
+            </select>
+        </div>
+
+        <!-- Other fields like plastic, speed, glide, etc. -->
+
+        <button type="submit" class="btn btn-primary">Add Disc</button>
+        <a href="/" class="btn btn-secondary">Back to Collection</a>
+    </form>
+{% endblock %}

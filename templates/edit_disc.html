@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Disc{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Edit Disc</h1>
+
+    <form action="/edit/{{ disc.id }}" method="post">
+        <div class="mb-3">
+            <label for="manufacturer" class="form-label">Manufacturer</label>
+            <input type="text" class="form-control" id="manufacturer" name="manufacturer" value="{{ disc.manufacturer }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="mold" class="form-label">Mold</label>
+            <input type="text" class="form-control" id="mold" name="mold" value="{{ disc.mold }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="plastic" class="form-label">Plastic</label>
+            <input type="text" class="form-control" id="plastic" name="plastic" value="{{ disc.plastic }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="speed" class="form-label">Speed</label>
+            <input type="number" class="form-control" id="speed" name="speed" value="{{ disc.speed }}" min="1" max="14">
+        </div>
+
+        <div class="mb-3">
+            <label for="glide" class="form-label">Glide</label>
+            <input type="number" class="form-control" id="glide" name="glide" value="{{ disc.glide }}" min="1" max="7">
+        </div>
+
+        <div class="mb-3">
+            <label for="turn" class="form-label">Turn</label>
+            <input type="number" class="form-control" id="turn" name="turn" value="{{ disc.turn }}" min="-5" max="1">
+        </div>
+
+        <div class="mb-3">
+            <label for="fade" class="form-label">Fade</label>
+            <input type="number" class="form-control" id="fade" name="fade" value="{{ disc.fade }}" min="0" max="5">
+        </div>
+
+        <!-- Dropdown for Type -->
+        <div class="mb-3">
+            <label for="type" class="form-label">Type</label>
+            <select class="form-select" id="type" name="type" required>
+                <option value="Distance Driver" {% if disc.type == "Distance Driver" %}selected{% endif %}>Distance Driver</option>
+                <option value="Fairway Driver" {% if disc.type == "Fairway Driver" %}selected{% endif %}>Fairway Driver</option>
+                <option value="Midrange" {% if disc.type == "Midrange" %}selected{% endif %}>Midrange</option>
+                <option value="Putter" {% if disc.type == "Putter" %}selected{% endif %}>Putter</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="color" class="form-label">Color</label>
+            <input type="text" class="form-control" id="color" name="color" value="{{ disc.color }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea class="form-control" id="notes" name="notes">{{ disc.notes }}</textarea>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="is_lost" name="is_lost" {% if disc.is_lost %}checked{% endif %}>
+            <label class="form-check-label" for="is_lost">Mark as Lost</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Disc</button>
+        <a href="/" class="btn btn-secondary">Back to Collection</a>
+    </form>
+{% endblock %}

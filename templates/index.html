@@ -22,8 +22,9 @@
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
                 <strong>{{ disc.manufacturer }}</strong> - {{ disc.mold }} (Type: {{ disc.type }})
-                (Plastic: {{ disc.plastic }}, Speed: {{ disc.speed }}, Glide: {{ disc.glide }},
-                Turn: {{ disc.turn }}, Fade: {{ disc.fade }}, Color: {{ disc.color }}, Notes: {{ disc.notes }})
+                (Weight: {{ disc.weight }} g, Plastic: {{ disc.plastic }}, Speed: {{ disc.speed }},
+                Glide: {{ disc.glide }}, Turn: {{ disc.turn }}, Fade: {{ disc.fade }},
+                Color: {{ disc.color }}, Notes: {{ disc.notes }})
                 {% if disc.is_lost %}
                     <span class="badge bg-danger">Lost</span>
                 {% endif %}

@@ -29,12 +29,13 @@ def add_disc():
         fade = request.form['fade']
         color = request.form['color']
         notes = request.form['notes']
-        disc_type = request.form['type']  # Get the type from the dropdown
+        disc_type = request.form['type']
+        weight = request.form.get('weight', type=float)  # New weight field
         is_lost = False  # New discs are not lost by default
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO discs (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, type, is_lost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, disc_type, is_lost))
+        cur.execute("INSERT INTO discs (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, type, weight, is_lost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, disc_type, weight, is_lost))
         mysql.connection.commit()
         cur.close()
         flash('Disc Added Successfully!')
@@ -46,45 +47,36 @@ def add_disc():
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_disc(id):
     cur = mysql.connection.cursor()
-
-    # Fetch the existing disc data from the database
     cur.execute("SELECT * FROM discs WHERE id = %s", (id,))
     disc = cur.fetchone()
     cur.close()
 
     if request.method == 'POST':
-        # Get the form data
-        manufacturer = request.form.get('manufacturer')
-        mold = request.form.get('mold')
-        plastic = request.form.get('plastic')
-        speed = request.form.get('speed', type=int)  # Ensure this is an integer
-        glide = request.form.get('glide', type=int)  # Ensure this is an integer
-        turn = request.form.get('turn', type=int)  # Ensure this is an integer
-        fade = request.form.get('fade', type=int)  # Ensure this is an integer
-        color = request.form.get('color')
-        notes = request.form.get('notes')
-        disc_type = request.form.get('type')  # Get the disc type from the dropdown
-        is_lost = request.form.get('is_lost') == 'on'  # Checkbox handling
+        manufacturer = request.form['manufacturer']
+        mold = request.form['mold']
+        plastic = request.form['plastic']
+        speed = request.form['speed']
+        glide = request.form['glide']
+        turn = request.form['turn']
+        fade = request.form['fade']
+        color = request.form['color']
+        notes = request.form['notes']
+        disc_type = request.form['type']
+        weight = request.form.get('weight', type=float)  # New weight field
+        is_lost = request.form.get('is_lost') == 'on'
 
-        # Validate required fields
-        if not manufacturer or not mold or not disc_type:
-            flash('Please fill in all required fields.', 'danger')
-            return redirect(url_for('edit_disc', id=id))
-
-        # Update the disc information in the database
         cur = mysql.connection.cursor()
         cur.execute("""
             UPDATE discs
-            SET manufacturer=%s, mold=%s, plastic=%s, speed=%s, glide=%s, turn=%s, fade=%s, color=%s, notes=%s, type=%s, is_lost=%s
+            SET manufacturer=%s, mold=%s, plastic=%s, speed=%s, glide=%s, turn=%s, fade=%s, color=%s, notes=%s, type=%s, weight=%s, is_lost=%s
             WHERE id=%s
-        """, (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, disc_type, is_lost, id))
+        """, (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, disc_type, weight, is_lost, id))
         mysql.connection.commit()
         cur.close()
 
-        flash('Disc Updated Successfully!', 'success')
+        flash('Disc Updated Successfully!')
         return redirect(url_for('index'))
 
-    # Render the edit_disc template, passing in the current disc data
     return render_template('edit_disc.html', disc=disc)
 
 # Delete disc

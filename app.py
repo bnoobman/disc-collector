@@ -10,11 +10,38 @@ app.secret_key = 'your_secret_key'
 # Home page to view all discs
 @app.route('/')
 def index():
+    # Get URL parameters for pagination, sorting, and search
+    page = request.args.get('page', 1, type=int)
+    sort_by = request.args.get('sort_by', 'manufacturer')
+    query = request.args.get('query', '')
+
+    # Define the number of items per page
+    per_page = 10
+    offset = (page - 1) * per_page
+
+    # Create SQL for search and sort
+    search_sql = f"WHERE manufacturer LIKE %s OR mold LIKE %s" if query else ""
+    order_sql = f"ORDER BY {sort_by}"
+
+    # Execute the query with pagination, search, and sorting
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM discs")
+    cur.execute(f"""
+        SELECT * FROM discs
+        {search_sql} {order_sql} 
+        LIMIT %s OFFSET %s
+    """, (f'%{query}%', f'%{query}%', per_page, offset) if query else (per_page, offset))
     discs = cur.fetchall()
+
+    # Get total count for pagination
+    cur.execute(f"SELECT COUNT(*) FROM discs {search_sql}", (f'%{query}%', f'%{query}%') if query else ())
+    total_count = cur.fetchone()['COUNT(*)']
     cur.close()
-    return render_template('index.html', discs=discs)
+
+    # Calculate total pages
+    total_pages = (total_count + per_page - 1) // per_page
+
+    return render_template('index.html', discs=discs, page=page, total_pages=total_pages, query=query, sort_by=sort_by)
+
 
 # Add new disc
 @app.route('/add', methods=['GET', 'POST'])

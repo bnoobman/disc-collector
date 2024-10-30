@@ -29,7 +29,7 @@
             <tbody>
                 {% for disc in search_results %}
                 <tr>
-                    <td>{{ disc.get('name', 'Unknown') }}</td>
+                    <td>{{ disc.get('name') or disc.get('disc_name', 'Unknown') }}</td>
                     <td>{{ disc.get('speed', 'N/A') }}</td>
                     <td>{{ disc.get('glide', 'N/A') }}</td>
                     <td>{{ disc.get('turn', 'N/A') }}</td>

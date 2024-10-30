@@ -1,0 +1,62 @@
+/* Custom Primary Color */
+:root {
+    --primary-color: #4CAF50; /* Adjust this color as needed */
+}
+
+/* Navbar Styling */
+.navbar-light.bg-light {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.navbar-brand,
+.nav-link {
+    color: white !important;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+/* Button Styles */
+.btn-warning,
+.btn-danger,
+.btn-primary,
+.btn {
+    background-color: var(--primary-color) !important;
+    border: none;
+    color: white !important;
+}
+.btn-danger {
+    background-color: #e74c3c !important; /* Distinct red color for delete button */
+}
+.btn:hover {
+    opacity: 0.8;
+}
+
+/* Table Styling */
+.table-hover tbody tr:hover {
+    background-color: #f2f2f2; /* Light gray for hover effect */
+}
+
+.badge.bg-danger {
+    background-color: #e74c3c; /* Red badge for 'Lost' status */
+}
+
+.badge.bg-success {
+    background-color: #4CAF50; /* Green badge for 'Available' status */
+}
+
+/* Additional Styling */
+.hover-underline:hover {
+    text-decoration: underline;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}

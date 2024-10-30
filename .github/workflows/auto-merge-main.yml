@@ -1,0 +1,37 @@
+name: Auto-Merge Develop to Main
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-and-merge-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create pull request to merge develop into main
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: main
+          title: "Auto Merge Develop into Main"
+          commit-message: "Auto Merge Develop into Main"
+          body: "This pull request was created automatically to merge changes from develop to main."
+          delete-branch: false
+
+      - name: Attempt to merge the pull request
+        if: steps.create_pr.outputs.pull-request-url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(echo "${{ steps.create_pr.outputs.pull-request-url }}" | sed 's#.*/##')
+          gh pr merge "$PR_NUMBER" --merge --admin

@@ -5,26 +5,76 @@
 {% block content %}
     <h1 class="mb-4">Add a New Disc</h1>
 
+    <!-- Search Bar to Find Disc from External API -->
+    <form action="{{ url_for('add_disc') }}" method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search_name" class="form-control" placeholder="Search Disc Info API for a disc by name" aria-label="Disc Name" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if search_results %}
+        <h3>Search Results:</h3>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Speed</th>
+                    <th>Glide</th>
+                    <th>Turn</th>
+                    <th>Fade</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disc in search_results %}
+                <tr>
+                    <td>{{ disc.get('name', 'Unknown') }}</td>
+                    <td>{{ disc.get('speed', 'N/A') }}</td>
+                    <td>{{ disc.get('glide', 'N/A') }}</td>
+                    <td>{{ disc.get('turn', 'N/A') }}</td>
+                    <td>{{ disc.get('fade', 'N/A') }}</td>
+                    <td>
+                        <a href="{{ url_for('add_disc',
+                            manufacturer=disc.get('table', ''),
+                            mold=disc.get('name', ''),
+                            speed=disc.get('speed', ''),
+                            glide=disc.get('glide', ''),
+                            turn=disc.get('turn', ''),
+                            fade=disc.get('fade', '')
+                        ) }}" class="btn btn-success btn-sm">
+                            Use This Disc
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif search_name %}
+        <p>No results found for "{{ search_name }}".</p>
+    {% endif %}
+
+    <!-- Add Disc Form -->
     <form action="/add" method="post">
         <div class="mb-3">
             <label for="manufacturer" class="form-label">Manufacturer</label>
-            <input type="text" class="form-control" id="manufacturer" name="manufacturer" required>
+            <input type="text" class="form-control" id="manufacturer" name="manufacturer" value="{{ manufacturer }}" required>
         </div>
 
         <div class="mb-3">
             <label for="mold" class="form-label">Mold</label>
-            <input type="text" class="form-control" id="mold" name="mold" required>
+            <input type="text" class="form-control" id="mold" name="mold" value="{{ mold }}" required>
         </div>
 
         <!-- Plastic and Color in a Single Row -->
         <div class="row mb-3">
             <div class="col">
                 <label for="plastic" class="form-label">Plastic</label>
-                <input type="text" class="form-control" id="plastic" name="plastic">
+                <input type="text" class="form-control" id="plastic" name="plastic" value="{{ plastic }}">
             </div>
             <div class="col">
                 <label for="color" class="form-label">Color</label>
-                <input type="text" class="form-control" id="color" name="color">
+                <input type="text" class="form-control" id="color" name="color" value="{{ color }}">
             </div>
         </div>
 
@@ -32,19 +82,19 @@
         <div class="row mb-3">
             <div class="col">
                 <label for="speed" class="form-label">Speed</label>
-                <input type="number" class="form-control" id="speed" name="speed" min="1" max="14" step="0.5">
+                <input type="number" class="form-control" id="speed" name="speed" min="1" max="14" step="0.5" value="{{ speed }}">
             </div>
             <div class="col">
                 <label for="glide" class="form-label">Glide</label>
-                <input type="number" class="form-control" id="glide" name="glide" min="1" max="7" step="0.5">
+                <input type="number" class="form-control" id="glide" name="glide" min="1" max="7" step="0.5" value="{{ glide }}">
             </div>
             <div class="col">
                 <label for="turn" class="form-label">Turn</label>
-                <input type="number" class="form-control" id="turn" name="turn" min="-5" max="1" step="0.5">
+                <input type="number" class="form-control" id="turn" name="turn" min="-5" max="1" step="0.5" value="{{ turn }}">
             </div>
             <div class="col">
                 <label for="fade" class="form-label">Fade</label>
-                <input type="number" class="form-control" id="fade" name="fade" min="0" max="5" step="0.5">
+                <input type="number" class="form-control" id="fade" name="fade" min="0" max="5" step="0.5" value="{{ fade }}">
             </div>
         </div>
 
@@ -53,22 +103,22 @@
             <div class="col">
                 <label for="type" class="form-label">Type</label>
                 <select class="form-select" id="type" name="type" required>
-                    <option value="" disabled selected>Select Type</option>
-                    <option value="Distance Driver">Distance Driver</option>
-                    <option value="Fairway Driver">Fairway Driver</option>
-                    <option value="Midrange">Midrange</option>
-                    <option value="Putter">Putter</option>
+                    <option value="" disabled {% if not type %}selected{% endif %}>Select Type</option>
+                    <option value="Distance Driver" {% if type == 'Distance Driver' %}selected{% endif %}>Distance Driver</option>
+                    <option value="Fairway Driver" {% if type == 'Fairway Driver' %}selected{% endif %}>Fairway Driver</option>
+                    <option value="Midrange" {% if type == 'Midrange' %}selected{% endif %}>Midrange</option>
+                    <option value="Putter" {% if type == 'Putter' %}selected{% endif %}>Putter</option>
                 </select>
             </div>
             <div class="col">
                 <label for="weight" class="form-label">Weight (grams)</label>
-                <input type="number" step="0.5" class="form-control" id="weight" name="weight" placeholder="e.g., 175.0">
+                <input type="number" step="0.5" class="form-control" id="weight" name="weight" value="{{ weight }}" placeholder="e.g., 175.0">
             </div>
         </div>
 
         <div class="mb-3">
             <label for="notes" class="form-label">Notes</label>
-            <textarea class="form-control" id="notes" name="notes"></textarea>
+            <textarea class="form-control" id="notes" name="notes">{{ notes }}</textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Add Disc</button>

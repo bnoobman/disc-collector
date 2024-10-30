@@ -1,9 +1,13 @@
 import os
+import requests
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
 # Import the appropriate config class
 from config import DevelopmentConfig, TestingConfig, ProductionConfig
+
+# Define the external API base URL for DiscInfo API
+API_BASE_URL = "http://localhost:8069/v1"
 
 app = Flask(__name__)
 
@@ -45,6 +49,7 @@ def index():
 @app.route('/add', methods=['GET', 'POST'])
 def add_disc():
     if request.method == 'POST':
+        # Handle form submission
         manufacturer = request.form['manufacturer']
         mold = request.form['mold']
         plastic = request.form['plastic']
@@ -55,8 +60,8 @@ def add_disc():
         color = request.form['color']
         notes = request.form['notes']
         disc_type = request.form['type']
-        weight = request.form.get('weight', type=float)  # New weight field
-        is_lost = False  # New discs are not lost by default
+        weight = request.form.get('weight', type=float)
+        is_lost = False
 
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO discs (manufacturer, mold, plastic, speed, glide, turn, fade, color, notes, type, weight, is_lost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
@@ -66,7 +71,35 @@ def add_disc():
         flash('Disc Added Successfully!')
         return redirect(url_for('index'))
 
-    return render_template('add_disc.html')
+    # Handle search request
+    search_name = request.args.get('search_name')
+    search_results = []
+    if search_name:
+        api_url = f"{API_BASE_URL}/search_discs_by_name/"
+        params = {'name': search_name}
+        try:
+            response = requests.get(api_url, params=params)
+            response.raise_for_status()
+            search_results = response.json()  # Assuming API returns a list
+        except requests.RequestException:
+            flash("Error retrieving disc information from the API.")
+
+    # Prepopulate form fields with data from query parameters (if any)
+    prepopulated_data = {
+        'manufacturer': request.args.get('manufacturer', ''),
+        'mold': request.args.get('mold', ''),
+        'plastic': request.args.get('plastic', ''),
+        'speed': request.args.get('speed', ''),
+        'glide': request.args.get('glide', ''),
+        'turn': request.args.get('turn', ''),
+        'fade': request.args.get('fade', ''),
+        'color': request.args.get('color', ''),
+        'notes': request.args.get('notes', ''),
+        'type': request.args.get('type', ''),
+        'weight': request.args.get('weight', '')
+    }
+
+    return render_template('add_disc.html', search_results=search_results, search_name=search_name, **prepopulated_data)
 
 # Edit disc
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -124,20 +157,6 @@ def mark_lost(id):
     flash('Disc Marked as Lost!')
     return redirect(url_for('index'))
 
-# Search and sort discs
-@app.route('/search')
-def search():
-    query = request.args.get('query')
-    sort_by = request.args.get('sort_by', 'manufacturer')  # Default sort by manufacturer
-    cur = mysql.connection.cursor()
-    if query:
-        cur.execute(f"SELECT * FROM discs WHERE manufacturer LIKE %s OR mold LIKE %s ORDER BY {sort_by}",
-                    (f'%{query}%', f'%{query}%'))
-    else:
-        cur.execute(f"SELECT * FROM discs ORDER BY {sort_by}")
-    discs = cur.fetchall()
-    cur.close()
-    return render_template('index.html', discs=discs)
 
 if __name__ == '__main__':
     app.run(debug=True)
